@@ -22,17 +22,21 @@ export class DeviceInfo {
 export interface DisplayOptions {
   showMobile: boolean;
   showDesktop: boolean;
+  installChromeAndroid: boolean;
 }
 
 export const DISPLAY_OPTIONS_DEFAULT: DisplayOptions = {
   showMobile: true,
-  showDesktop: true
-}
+  showDesktop: true,
+  installChromeAndroid: false,
+};
 
 export function isDisplayOptions(obj: any): obj is DisplayOptions {
-  return obj
-    && typeof obj.showMobile === 'boolean'
-    && typeof obj.showDesktop === 'boolean';
+  return (
+    obj &&
+    typeof obj.showMobile === "boolean" &&
+    typeof obj.showDesktop === "boolean"
+  );
 }
 
 export interface ADHSBeforeInstallPromptEvent extends Event {

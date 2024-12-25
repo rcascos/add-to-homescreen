@@ -1,5 +1,12 @@
 # add-to-homescreen 📱 🖥️
 
+## Diff
+
+Fork of [philfung/add-to-homescreen](https://github.com/philfung/add-to-homescreen) repo, version 2.93. The main differences with the original are:
+
+- Works on Firefox for Android (with an icon created specifically for that browser).
+- New "DisplayOption" named "installChromeAndroid". If true, it offers to install the app not only in Chrome for Desktop but also Chrome for Android.
+
 ## Motivation
 
 Add to home screen allows websites and PWA's to work like native apps without registering in the Apple or Google App Stores. Currently, it is very difficult to get users to add web apps to their home screen, limiting the utility of such websites compared to native apps. See [related Medium blog post](https://medium.com/@philipfung/add-to-homescreen-websites-an-option-for-startups-in-2023-efb92f5e03ad).
@@ -124,7 +131,11 @@ This should be a quick drop-in library into your website.
 
      maxModalDisplayCount: -1,                              // If set, the modal will only show this many times.
                                                             // [Optional] Default: -1 (no limit).  (Debugging: Use this.clearModalDisplayCount() to reset the count)
-     displayOptions:{ showMobile: true, showDesktop: true }, // show on mobile/desktop [Optional] Default: show everywhere
+     displayOptions:{
+        showMobile: true,
+        showDesktop: true,
+        installChromeAndroid: true
+     }, // show on mobile/desktop, show install on Chrome for Android (like Chrome for Desktop) [Optional] Default: show everywhere, not install directly on Chrome for Android
      allowClose: true, // allow the user to close the modal by tapping outside of it [Optional. Default: true]
 
 
