@@ -37,7 +37,7 @@ simpleI18n_1.default.configure({
     directory: ".",
 });
 function AddToHomeScreen(options) {
-    let { appIconUrl, appName, appNameDisplay, assetUrl, maxModalDisplayCount, displayOptions, allowClose } = options;
+    let { appIconUrl, appName, appNameDisplay, assetUrl, maxModalDisplayCount, displayOptions, allowClose, } = options;
     let closeEventListener = null;
     const userAgent = window.navigator.userAgent;
     _assertArg("appName", typeof appName === "string" && appName.length > 0);
@@ -73,7 +73,8 @@ function AddToHomeScreen(options) {
             const language_from_browser_settings = simpleI18n_1.default._getLanguageFromBrowserSettings();
             // if no locale indicated
             // check url param "locale" and browser settings
-            if (language_from_browser_settings && localeCatalog[language_from_browser_settings]) {
+            if (language_from_browser_settings &&
+                localeCatalog[language_from_browser_settings]) {
                 locale = language_from_browser_settings;
                 // if "en" intl file is available, default to "en"
             }
@@ -144,6 +145,10 @@ function AddToHomeScreen(options) {
                 if (isBrowserAndroidChrome()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
                     _genAndroidChrome(container);
+                }
+                else if (isBrowserAndroidFirefox()) {
+                    ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
+                    _genAndroidFirefox(container);
                 }
                 else if (isBrowserAndroidFacebook()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = false), (_device = _device));
@@ -313,6 +318,13 @@ function AddToHomeScreen(options) {
             userAgent.includes("Macintosh") ||
             userAgent.includes("Linux");
         return isChrome && isDesktop;
+    }
+    function isDesktopFirefox() {
+        const isFirefox = userAgent.includes("Firefox") && !userAgent.includes("Seamonkey"); // Exclude Seamonkey browser
+        const isDesktop = userAgent.includes("Windows") ||
+            userAgent.includes("Macintosh") ||
+            userAgent.includes("Linux");
+        return isFirefox && isDesktop;
     }
     function isDesktopSafari() {
         const isSafari = userAgent.includes("Safari") &&
@@ -534,6 +546,29 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-android", "adhs-chrome");
     }
+    function _genAndroidFirefox(container) {
+        var containerInnerHTML = _genModalStart() +
+            _genInstallAppHeader() +
+            _genAppNameHeader() +
+            // _genAppUrlHeader() +
+            _genListStart() +
+            _genListItem(`1`, simpleI18n_1.default.__("Tap %s in the browser bar.", _genListButtonWithImage(_genAssetUrl("android-chrome-more-button-2.svg")))) +
+            _genListItem(`2`, simpleI18n_1.default.__("Tap %s", _genListButtonWithImage(_genAssetUrl("android-firefox-add-to-home-screen-button-2.svg"), simpleI18n_1.default.__("Add to Home Screen Firefox") !==
+                "Add to Home Screen Firefox"
+                ? simpleI18n_1.default.__("Add to Home Screen Firefox")
+                : simpleI18n_1.default.__("Add to Home Screen"), "left"))) +
+            // _genListItem(`3`, i18n.__('Open the %s app.', `<img class="adhs-your-app-icon" src="${appIconUrl}"/>`)) +
+            _genListEnd() +
+            _genBlurbMobile() +
+            _genModalEnd() +
+            div("android-chrome-bouncing-arrow-container") +
+            `<img src="` +
+            _genAssetUrl("android-chrome-bouncing-arrow.svg") +
+            `" alt="arrow" />
+    </div>`;
+        container.innerHTML = containerInnerHTML;
+        container.classList.add("adhs-mobile", "adhs-android", "adhs-chrome");
+    }
     function _genInstallAppHeader() {
         const text = appNameDisplay === "inline"
             ? simpleI18n_1.default.__("Install %s", appName)
@@ -722,7 +757,8 @@ function AddToHomeScreen(options) {
         //   this means the event will never fire, like in Incognito mode
         if (_desktopInstallPromptEvent === null &&
             !(_desktopInstallPromptStartTimeMS &&
-                ((Date.now() - _desktopInstallPromptStartTimeMS) > DESKTOP_INSTALL_MAX_WAIT_TIME_MS))) {
+                Date.now() - _desktopInstallPromptStartTimeMS >
+                    DESKTOP_INSTALL_MAX_WAIT_TIME_MS)) {
             // debugMessage("SHOW DESKTOP CHROME PROMOTION: PROMPT NOT FIRED");
             if (_desktopInstallPromptStartTimeMS === null) {
                 _desktopInstallPromptStartTimeMS = Date.now();
@@ -970,7 +1006,7 @@ webpackContext.id = 259;
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Přidat na plochu","Add To Dock":"Přidat do Docku","An icon will be added to your Dock so you can quickly access this website.":"Ikona bude přidána do vašeho Docku, abyste měli rychlý přístup k této webové stránce.","An icon will be added to your home screen so you can quickly access this website.":"Ikona bude přidána na vaši domovskou obrazovku, abyste měli rychlý přístup k této webové stránce.","An icon will be added to your Taskbar so you can quickly access this website.":"Ikona bude přidána na váš panel úloh, abyste měli rychlý přístup k této webové stránce.","Install":"Instalovat","Install %s":"Instalovat %s","Install app":"Instalovat aplikaci","Later":"Později","Open in browser":"Otevřít v prohlížeči","Select %s from the menu that pops up.":"Vyberte %s z nabídky, která se zobrazí.","Tap %s":"Klepněte na %s","Tap %s in the browser bar.":"Klepněte na %s v panelu prohlížeče.","Tap %s in the toolbar.":"Klepněte na %s v panelu nástrojů.","Tap the %s button above.":"Klepněte na tlačítko %s výše.","Tap the %s button below to open your system browser.":"Klepněte na tlačítko %s níže pro otevření systémového prohlížeče.","Tap the %s button in the toolbar.":"Klepněte na tlačítko %s v panelu nástrojů.","Tap the %s button in the upper right corner.":"Klepněte na tlačítko %s v pravém horním rohu.","You may need to scroll down to find this menu item.":"Možná budete muset posunout dolů, abyste tuto položku nabídky našli."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Přidat na plochu","Add to Home Screen Firefox":"Přidat na plochu","Add To Dock":"Přidat do Docku","An icon will be added to your Dock so you can quickly access this website.":"Ikona bude přidána do vašeho Docku, abyste měli rychlý přístup k této webové stránce.","An icon will be added to your home screen so you can quickly access this website.":"Ikona bude přidána na vaši domovskou obrazovku, abyste měli rychlý přístup k této webové stránce.","An icon will be added to your Taskbar so you can quickly access this website.":"Ikona bude přidána na váš panel úloh, abyste měli rychlý přístup k této webové stránce.","Install":"Instalovat","Install %s":"Instalovat %s","Install app":"Instalovat aplikaci","Later":"Později","Open in browser":"Otevřít v prohlížeči","Select %s from the menu that pops up.":"Vyberte %s z nabídky, která se zobrazí.","Tap %s":"Klepněte na %s","Tap %s in the browser bar.":"Klepněte na %s v panelu prohlížeče.","Tap %s in the toolbar.":"Klepněte na %s v panelu nástrojů.","Tap the %s button above.":"Klepněte na tlačítko %s výše.","Tap the %s button below to open your system browser.":"Klepněte na tlačítko %s níže pro otevření systémového prohlížeče.","Tap the %s button in the toolbar.":"Klepněte na tlačítko %s v panelu nástrojů.","Tap the %s button in the upper right corner.":"Klepněte na tlačítko %s v pravém horním rohu.","You may need to scroll down to find this menu item.":"Možná budete muset posunout dolů, abyste tuto položku nabídky našli."}');
 
 /***/ }),
 
@@ -978,7 +1014,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"Přidat na plochu","Add To D
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Tilføj til startskærm","Add To Dock":"Tilføj til dock","An icon will be added to your Dock so you can quickly access this website.":"Et ikon vil blive tilføjet til din dock, så du hurtigt kan få adgang til dette website.","An icon will be added to your home screen so you can quickly access this website.":"Et ikon vil blive tilføjet til din startskærm, så du hurtigt kan få adgang til dette website.","An icon will be added to your Taskbar so you can quickly access this website.":"Et ikon vil blive tilføjet til din proceslinje, så du hurtigt kan få adgang til dette website.","Install":"Installer","Install %s":"Installer %s","Install app":"Installer app","Later":"Senere","Open in browser":"Åbn i browser","Select %s from the menu that pops up.":"Vælg %s fra menuen, der dukker op.","Tap %s":"Tryk på %s","Tap %s in the browser bar.":"Tryk på %s i browserlinjen.","Tap %s in the toolbar.":"Tryk på %s i værktøjslinjen.","Tap the %s button above.":"Tryk på %s-knappen ovenfor.","Tap the %s button below to open your system browser.":"Tryk på %s-knappen nedenfor for at åbne din systembrowser.","Tap the %s button in the toolbar.":"Tryk på %s-knappen i værktøjslinjen.","Tap the %s button in the upper right corner.":"Tryk på %s-knappen i øverste højre hjørne.","You may need to scroll down to find this menu item.":"Du skal måske rulle ned for at finde dette menupunkt."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Tilføj til startskærm","Add to Home Screen Firefox":"Tilføj til startskærm","Add To Dock":"Tilføj til dock","An icon will be added to your Dock so you can quickly access this website.":"Et ikon vil blive tilføjet til din dock, så du hurtigt kan få adgang til dette website.","An icon will be added to your home screen so you can quickly access this website.":"Et ikon vil blive tilføjet til din startskærm, så du hurtigt kan få adgang til dette website.","An icon will be added to your Taskbar so you can quickly access this website.":"Et ikon vil blive tilføjet til din proceslinje, så du hurtigt kan få adgang til dette website.","Install":"Installer","Install %s":"Installer %s","Install app":"Installer app","Later":"Senere","Open in browser":"Åbn i browser","Select %s from the menu that pops up.":"Vælg %s fra menuen, der dukker op.","Tap %s":"Tryk på %s","Tap %s in the browser bar.":"Tryk på %s i browserlinjen.","Tap %s in the toolbar.":"Tryk på %s i værktøjslinjen.","Tap the %s button above.":"Tryk på %s-knappen ovenfor.","Tap the %s button below to open your system browser.":"Tryk på %s-knappen nedenfor for at åbne din systembrowser.","Tap the %s button in the toolbar.":"Tryk på %s-knappen i værktøjslinjen.","Tap the %s button in the upper right corner.":"Tryk på %s-knappen i øverste højre hjørne.","You may need to scroll down to find this menu item.":"Du skal måske rulle ned for at finde dette menupunkt."}');
 
 /***/ }),
 
@@ -986,7 +1022,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"Tilføj til startskærm","Ad
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Zum Home-Bildschirm","Add To Dock":"Zum Dock hinzufügen","An icon will be added to your Dock so you can quickly access this website.":"Ein Symbol wird zu Ihrem Dock hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","An icon will be added to your home screen so you can quickly access this website.":"Ein Symbol wird zu Ihrem Startbildschirm hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","An icon will be added to your Taskbar so you can quickly access this website.":"Ein Symbol wird zu Ihrer Taskleiste hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","Install":"Installieren","Install %s":"%s installieren","Install app":"App installieren","Later":"Später","Open in browser":"Im Browser öffnen","Select %s from the menu that pops up.":"Wählen Sie %s aus dem Menü, das erscheint.","Tap %s":"Tippen Sie auf %s","Tap %s in the browser bar.":"Tippen Sie auf %s in der Browserleiste.","Tap %s in the toolbar.":"Tippen Sie auf %s in der Symbolleiste.","Tap the %s button above.":"Tippen Sie oben auf die Schaltfläche %s.","Tap the %s button below to open your system browser.":"Tippen Sie unten auf die Schaltfläche %s, um Ihren Systembrowser zu öffnen.","Tap the %s button in the toolbar.":"Tippen Sie auf die Schaltfläche %s in der Symbolleiste.","Tap the %s button in the upper right corner.":"Tippen Sie auf die Schaltfläche %s in der oberen rechten Ecke.","You may need to scroll down to find this menu item.":"Sie müssen möglicherweise nach unten scrollen, um diesen Menüpunkt zu finden."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Zum Home-Bildschirm","Add to Home Screen Firefox":"Zum Startbildschirm hinzufügen","Add To Dock":"Zum Dock hinzufügen","An icon will be added to your Dock so you can quickly access this website.":"Ein Symbol wird zu Ihrem Dock hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","An icon will be added to your home screen so you can quickly access this website.":"Ein Symbol wird zu Ihrem Startbildschirm hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","An icon will be added to your Taskbar so you can quickly access this website.":"Ein Symbol wird zu Ihrer Taskleiste hinzugefügt, damit Sie schnell auf diese Website zugreifen können.","Install":"Installieren","Install %s":"%s installieren","Install app":"App installieren","Later":"Später","Open in browser":"Im Browser öffnen","Select %s from the menu that pops up.":"Wählen Sie %s aus dem Menü, das erscheint.","Tap %s":"Tippen Sie auf %s","Tap %s in the browser bar.":"Tippen Sie auf %s in der Browserleiste.","Tap %s in the toolbar.":"Tippen Sie auf %s in der Symbolleiste.","Tap the %s button above.":"Tippen Sie oben auf die Schaltfläche %s.","Tap the %s button below to open your system browser.":"Tippen Sie unten auf die Schaltfläche %s, um Ihren Systembrowser zu öffnen.","Tap the %s button in the toolbar.":"Tippen Sie auf die Schaltfläche %s in der Symbolleiste.","Tap the %s button in the upper right corner.":"Tippen Sie auf die Schaltfläche %s in der oberen rechten Ecke.","You may need to scroll down to find this menu item.":"Sie müssen möglicherweise nach unten scrollen, um diesen Menüpunkt zu finden."}');
 
 /***/ }),
 
@@ -994,7 +1030,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"Zum Home-Bildschirm","Add To
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Add to Home Screen","Add To Dock":"Add To Dock","An icon will be added to your Dock so you can quickly access this website.":"An icon will be added to your Dock so you can quickly access this website.","An icon will be added to your home screen so you can quickly access this website.":"An icon will be added to your home screen so you can quickly access this website.","An icon will be added to your Taskbar so you can quickly access this website.":"An icon will be added to your Taskbar so you can quickly access this website.","Install":"Install","Install %s":"Install %s","Install app":"Install app","Later":"Later","Open in browser":"Open in browser","Select %s from the menu that pops up.":"Select %s from the menu that pops up.","Tap %s":"Tap %s","Tap %s in the browser bar.":"Tap %s in the browser bar.","Tap %s in the toolbar.":"Tap %s in the toolbar.","Tap the %s button above.":"Tap the %s button above.","Tap the %s button below to open your system browser.":"Tap the %s button below to open your system browser.","Tap the %s button in the toolbar.":"Tap the %s button in the toolbar.","Tap the %s button in the upper right corner.":"Tap the %s button in the upper right corner.","You may need to scroll down to find this menu item.":"You may need to scroll down to find this menu item."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Add to Home Screen","Add to Home Screen Firefox":"Add to Home screen","Add To Dock":"Add To Dock","An icon will be added to your Dock so you can quickly access this website.":"An icon will be added to your Dock so you can quickly access this website.","An icon will be added to your home screen so you can quickly access this website.":"An icon will be added to your home screen so you can quickly access this website.","An icon will be added to your Taskbar so you can quickly access this website.":"An icon will be added to your Taskbar so you can quickly access this website.","Install":"Install","Install %s":"Install %s","Install app":"Install app","Later":"Later","Open in browser":"Open in browser","Select %s from the menu that pops up.":"Select %s from the menu that pops up.","Tap %s":"Tap %s","Tap %s in the browser bar.":"Tap %s in the browser bar.","Tap %s in the toolbar.":"Tap %s in the toolbar.","Tap the %s button above.":"Tap the %s button above.","Tap the %s button below to open your system browser.":"Tap the %s button below to open your system browser.","Tap the %s button in the toolbar.":"Tap the %s button in the toolbar.","Tap the %s button in the upper right corner.":"Tap the %s button in the upper right corner.","You may need to scroll down to find this menu item.":"You may need to scroll down to find this menu item."}');
 
 /***/ }),
 
@@ -1002,7 +1038,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"Add to Home Screen","Add To 
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Agregar a Inicio","Add To Dock":"Añadir al Dock","An icon will be added to your Dock so you can quickly access this website.":"Se añadirá un icono a tu Dock para que puedas acceder rápidamente a este sitio web.","An icon will be added to your home screen so you can quickly access this website.":"Se añadirá un icono a tu pantalla de inicio para que puedas acceder rápidamente a este sitio web.","An icon will be added to your Taskbar so you can quickly access this website.":"Se añadirá un icono a tu barra de tareas para que puedas acceder rápidamente a este sitio web.","Install":"Instalar","Install %s":"Instalar %s","Install app":"Instalar aplicación","Later":"Más tarde","Open in browser":"Abrir en el navegador","Select %s from the menu that pops up.":"Selecciona %s del menú emergente.","Tap %s":"Toca %s","Tap %s in the browser bar.":"Toca %s en la barra del navegador.","Tap %s in the toolbar.":"Toca %s en la barra de herramientas.","Tap the %s button above.":"Toca el botón %s de arriba.","Tap the %s button below to open your system browser.":"Toca el botón %s de abajo para abrir el navegador de tu sistema.","Tap the %s button in the toolbar.":"Toca el botón %s en la barra de herramientas.","Tap the %s button in the upper right corner.":"Toca el botón %s en la esquina superior derecha.","You may need to scroll down to find this menu item.":"Es posible que necesites desplazarte hacia abajo para encontrar este elemento del menú."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Añadir a pantalla de inicio","Add to Home Screen Firefox":"Agregar a la pantalla de Inicio","Add To Dock":"Añadir al Dock","An icon will be added to your Dock so you can quickly access this website.":"Se añadirá un icono a tu Dock para que puedas acceder rápidamente a este sitio web.","An icon will be added to your home screen so you can quickly access this website.":"Se añadirá un icono a tu pantalla de inicio para que puedas acceder rápidamente a este sitio web.","An icon will be added to your Taskbar so you can quickly access this website.":"Se añadirá un icono a tu barra de tareas para que puedas acceder rápidamente a este sitio web.","Install":"Instalar","Install %s":"Instalar %s","Install app":"Instalar aplicación","Later":"Más tarde","Open in browser":"Abrir en el navegador","Select %s from the menu that pops up.":"Selecciona %s del menú emergente.","Tap %s":"Toca %s","Tap %s in the browser bar.":"Toca %s en la barra del navegador.","Tap %s in the toolbar.":"Toca %s en la barra de herramientas.","Tap the %s button above.":"Toca el botón %s de arriba.","Tap the %s button below to open your system browser.":"Toca el botón %s de abajo para abrir el navegador de tu sistema.","Tap the %s button in the toolbar.":"Toca el botón %s en la barra de herramientas.","Tap the %s button in the upper right corner.":"Toca el botón %s en la esquina superior derecha.","You may need to scroll down to find this menu item.":"Es posible que necesites desplazarte hacia abajo para encontrar este elemento del menú."}');
 
 /***/ }),
 
@@ -1010,7 +1046,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"Agregar a Inicio","Add To Do
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Sur l\'écran d\'accueil","Add To Dock":"Ajouter au Dock","An icon will be added to your Dock so you can quickly access this website.":"Une icône sera ajoutée à votre Dock pour accéder rapidement à ce site web.","An icon will be added to your home screen so you can quickly access this website.":"Une icône sera ajoutée à votre écran d\'accueil pour accéder rapidement à ce site web.","An icon will be added to your Taskbar so you can quickly access this website.":"Une icône sera ajoutée à votre barre des tâches pour accéder rapidement à ce site web.","Install":"Installer","Install %s":"Installer %s","Install app":"Installer l\'application","Later":"Plus tard","Open in browser":"Ouvrir dans le navigateur","Select %s from the menu that pops up.":"Sélectionnez %s dans le menu qui apparaît.","Tap %s":"Appuyez sur %s","Tap %s in the browser bar.":"Appuyez sur %s dans la barre du navigateur.","Tap %s in the toolbar.":"Appuyez sur %s dans la barre d\'outils.","Tap the %s button above.":"Appuyez sur le bouton %s ci-dessus.","Tap the %s button below to open your system browser.":"Appuyez sur le bouton %s ci-dessous pour ouvrir votre navigateur système.","Tap the %s button in the toolbar.":"Appuyez sur le bouton %s dans la barre d\'outils.","Tap the %s button in the upper right corner.":"Appuyez sur le bouton %s dans le coin supérieur droit.","You may need to scroll down to find this menu item.":"Vous devrez peut-être faire défiler vers le bas pour trouver cet élément du menu."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Sur l\'écran d\'accueil","Add to Home Screen Firefox":"Ajouter à l\'écran d\'accueil","Add To Dock":"Ajouter au Dock","An icon will be added to your Dock so you can quickly access this website.":"Une icône sera ajoutée à votre Dock pour accéder rapidement à ce site web.","An icon will be added to your home screen so you can quickly access this website.":"Une icône sera ajoutée à votre écran d\'accueil pour accéder rapidement à ce site web.","An icon will be added to your Taskbar so you can quickly access this website.":"Une icône sera ajoutée à votre barre des tâches pour accéder rapidement à ce site web.","Install":"Installer","Install %s":"Installer %s","Install app":"Installer l\'application","Later":"Plus tard","Open in browser":"Ouvrir dans le navigateur","Select %s from the menu that pops up.":"Sélectionnez %s dans le menu qui apparaît.","Tap %s":"Appuyez sur %s","Tap %s in the browser bar.":"Appuyez sur %s dans la barre du navigateur.","Tap %s in the toolbar.":"Appuyez sur %s dans la barre d\'outils.","Tap the %s button above.":"Appuyez sur le bouton %s ci-dessus.","Tap the %s button below to open your system browser.":"Appuyez sur le bouton %s ci-dessous pour ouvrir votre navigateur système.","Tap the %s button in the toolbar.":"Appuyez sur le bouton %s dans la barre d\'outils.","Tap the %s button in the upper right corner.":"Appuyez sur le bouton %s dans le coin supérieur droit.","You may need to scroll down to find this menu item.":"Vous devrez peut-être faire défiler vers le bas pour trouver cet élément du menu."}');
 
 /***/ }),
 
@@ -1026,7 +1062,7 @@ module.exports = JSON.parse('{"Add to Home Screen":"הוסף למסך הבית",
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"Add to Home Screen":"Aggiungi alla schermata Home","Add To Dock":"Aggiungi al Dock","An icon will be added to your Dock so you can quickly access this website.":"Un\'icona verrà aggiunta al tuo Dock per accedere rapidamente a questo sito web.","An icon will be added to your home screen so you can quickly access this website.":"Un\'icona verrà aggiunta alla tua schermata Home per accedere rapidamente a questo sito web.","An icon will be added to your Taskbar so you can quickly access this website.":"Un\'icona verrà aggiunta alla tua barra delle applicazioni per accedere rapidamente a questo sito web.","Install":"Installa","Install %s":"Installa %s","Install app":"Installa app","Later":"Più tardi","Open in browser":"Apri nel browser","Select %s from the menu that pops up.":"Seleziona %s dal menu che appare.","Tap %s":"Tocca %s","Tap %s in the browser bar.":"Tocca %s nella barra del browser.","Tap %s in the toolbar.":"Tocca %s nella barra degli strumenti.","Tap the %s button above.":"Tocca il pulsante %s sopra.","Tap the %s button below to open your system browser.":"Tocca il pulsante %s sotto per aprire il browser di sistema.","Tap the %s button in the toolbar.":"Tocca il pulsante %s nella barra degli strumenti.","Tap the %s button in the upper right corner.":"Tocca il pulsante %s nell\'angolo in alto a destra.","You may need to scroll down to find this menu item.":"Potrebbe essere necessario scorrere verso il basso per trovare questa voce di menu."}');
+module.exports = JSON.parse('{"Add to Home Screen":"Aggiungi alla schermata Home","Add to Home Screen Firefox":"Agg. a schermata principale","Add To Dock":"Aggiungi al Dock","An icon will be added to your Dock so you can quickly access this website.":"Un\'icona verrà aggiunta al tuo Dock per accedere rapidamente a questo sito web.","An icon will be added to your home screen so you can quickly access this website.":"Un\'icona verrà aggiunta alla tua schermata Home per accedere rapidamente a questo sito web.","An icon will be added to your Taskbar so you can quickly access this website.":"Un\'icona verrà aggiunta alla tua barra delle applicazioni per accedere rapidamente a questo sito web.","Install":"Installa","Install %s":"Installa %s","Install app":"Installa app","Later":"Più tardi","Open in browser":"Apri nel browser","Select %s from the menu that pops up.":"Seleziona %s dal menu che appare.","Tap %s":"Tocca %s","Tap %s in the browser bar.":"Tocca %s nella barra del browser.","Tap %s in the toolbar.":"Tocca %s nella barra degli strumenti.","Tap the %s button above.":"Tocca il pulsante %s sopra.","Tap the %s button below to open your system browser.":"Tocca il pulsante %s sotto per aprire il browser di sistema.","Tap the %s button in the toolbar.":"Tocca il pulsante %s nella barra degli strumenti.","Tap the %s button in the upper right corner.":"Tocca il pulsante %s nell\'angolo in alto a destra.","You may need to scroll down to find this menu item.":"Potrebbe essere necessario scorrere verso il basso per trovare questa voce di menu."}');
 
 /***/ }),
 

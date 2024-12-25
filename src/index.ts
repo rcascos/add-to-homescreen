@@ -5,9 +5,8 @@ import {
   ADHSBeforeInstallPromptEvent,
   DeviceInfo,
   DeviceType,
-  DisplayOptions,
+  DISPLAY_OPTIONS_DEFAULT,
   isDisplayOptions,
-  DISPLAY_OPTIONS_DEFAULT
 } from "./types";
 
 const config = require("./config");
@@ -31,8 +30,15 @@ i18n.configure({
 export function AddToHomeScreen(
   options: AddToHomeScreenOptions
 ): AddToHomeScreenType {
-  let { appIconUrl, appName, appNameDisplay, assetUrl, maxModalDisplayCount, displayOptions, allowClose } =
-    options;
+  let {
+    appIconUrl,
+    appName,
+    appNameDisplay,
+    assetUrl,
+    maxModalDisplayCount,
+    displayOptions,
+    allowClose,
+  } = options;
   let closeEventListener: EventListener | null = null;
 
   const userAgent = window.navigator.userAgent;
@@ -52,9 +58,9 @@ export function AddToHomeScreen(
     maxModalDisplayCount === undefined ? -1 : maxModalDisplayCount;
   _assertArg("maxModalDisplayCount", Number.isInteger(maxModalDisplayCount));
 
-  displayOptions = 
+  displayOptions =
     displayOptions === undefined ? DISPLAY_OPTIONS_DEFAULT : displayOptions;
-  _assertArg("displayOptions", isDisplayOptions(displayOptions))
+  _assertArg("displayOptions", isDisplayOptions(displayOptions));
 
   allowClose = allowClose === undefined ? true : allowClose;
   _assertArg("allowClose", typeof allowClose === "boolean");
@@ -76,22 +82,28 @@ export function AddToHomeScreen(
   }
 
   function show(locale: string): DeviceInfo {
-
     if (locale && !localeCatalog[locale]) {
-      console.log("add-to-homescreen: WARNING: locale selected not available:", locale);
+      console.log(
+        "add-to-homescreen: WARNING: locale selected not available:",
+        locale
+      );
       locale = "";
     }
 
     if (!locale) {
-      const language_from_browser_settings = i18n._getLanguageFromBrowserSettings();
+      const language_from_browser_settings =
+        i18n._getLanguageFromBrowserSettings();
       // if no locale indicated
       // check url param "locale" and browser settings
-      if (language_from_browser_settings && localeCatalog[language_from_browser_settings]) {
+      if (
+        language_from_browser_settings &&
+        localeCatalog[language_from_browser_settings]
+      ) {
         locale = language_from_browser_settings;
-      // if "en" intl file is available, default to "en"
+        // if "en" intl file is available, default to "en"
       } else if (localeCatalog["en"]) {
         locale = "en";
-      // else default to first language available
+        // else default to first language available
       } else {
         locale = Object.keys(localeCatalog)[0];
       }
@@ -127,7 +139,7 @@ export function AddToHomeScreen(
         (_device = _device)
       );
     } else if (
-      displayOptions.showMobile && 
+      displayOptions.showMobile &&
       (isDeviceIOS() || isDeviceAndroid())
     ) {
       debugMessage("NOT STANDALONE - IOS OR ANDROID");
@@ -192,6 +204,13 @@ export function AddToHomeScreen(
             (_device = _device)
           );
           _genAndroidChrome(container);
+        } else if (isBrowserAndroidFirefox()) {
+          ret = new DeviceInfo(
+            (_isStandAlone = false),
+            (_canBeStandAlone = true),
+            (_device = _device)
+          );
+          _genAndroidFirefox(container);
         } else if (isBrowserAndroidFacebook()) {
           ret = new DeviceInfo(
             (_isStandAlone = false),
@@ -220,7 +239,6 @@ export function AddToHomeScreen(
         (_canBeStandAlone = false),
         (_device = _device)
       );
-
 
       if (displayOptions.showDesktop) {
         if (isDesktopChrome() || isDesktopEdge()) {
@@ -412,6 +430,17 @@ export function AddToHomeScreen(
       userAgent.includes("Linux");
 
     return isChrome && isDesktop;
+  }
+
+  function isDesktopFirefox() {
+    const isFirefox =
+      userAgent.includes("Firefox") && !userAgent.includes("Seamonkey"); // Exclude Seamonkey browser
+    const isDesktop =
+      userAgent.includes("Windows") ||
+      userAgent.includes("Macintosh") ||
+      userAgent.includes("Linux");
+
+    return isFirefox && isDesktop;
   }
 
   function isDesktopSafari() {
@@ -763,6 +792,49 @@ export function AddToHomeScreen(
     container.classList.add("adhs-mobile", "adhs-android", "adhs-chrome");
   }
 
+  function _genAndroidFirefox(container: HTMLElement) {
+    var containerInnerHTML =
+      _genModalStart() +
+      _genInstallAppHeader() +
+      _genAppNameHeader() +
+      // _genAppUrlHeader() +
+      _genListStart() +
+      _genListItem(
+        `1`,
+        i18n.__(
+          "Tap %s in the browser bar.",
+          _genListButtonWithImage(
+            _genAssetUrl("android-chrome-more-button-2.svg")
+          )
+        )
+      ) +
+      _genListItem(
+        `2`,
+        i18n.__(
+          "Tap %s",
+          _genListButtonWithImage(
+            _genAssetUrl("android-firefox-add-to-home-screen-button-2.svg"),
+            i18n.__("Add to Home Screen Firefox") !==
+              "Add to Home Screen Firefox"
+              ? i18n.__("Add to Home Screen Firefox")
+              : i18n.__("Add to Home Screen"),
+            "left"
+          )
+        )
+      ) +
+      // _genListItem(`3`, i18n.__('Open the %s app.', `<img class="adhs-your-app-icon" src="${appIconUrl}"/>`)) +
+      _genListEnd() +
+      _genBlurbMobile() +
+      _genModalEnd() +
+      div("android-chrome-bouncing-arrow-container") +
+      `<img src="` +
+      _genAssetUrl("android-chrome-bouncing-arrow.svg") +
+      `" alt="arrow" />
+    </div>`;
+    container.innerHTML = containerInnerHTML;
+    container.classList.add("adhs-mobile", "adhs-android", "adhs-chrome");
+  }
+
   function _genInstallAppHeader() {
     const text =
       appNameDisplay === "inline"
@@ -841,7 +913,7 @@ export function AddToHomeScreen(
     var cancelButton =
       container.getElementsByClassName("adhs-button-cancel")[0];
     cancelButton.addEventListener("click", () => {
-        closeModal();
+      closeModal();
     });
 
     var installButton = container.getElementsByClassName(
@@ -1025,11 +1097,14 @@ export function AddToHomeScreen(
     // - if the prompt has not fired, wait for it the be fired, then show the promotion
     // - Don't bother showing promotion if wait time > DESKTOP_INSTALL_MAX_WAIT_TIME_MS,
     //   this means the event will never fire, like in Incognito mode
-    if (_desktopInstallPromptEvent === null && 
-        !(_desktopInstallPromptStartTimeMS && 
-          ((Date.now() - _desktopInstallPromptStartTimeMS) > DESKTOP_INSTALL_MAX_WAIT_TIME_MS)
-         ) 
-       ) {
+    if (
+      _desktopInstallPromptEvent === null &&
+      !(
+        _desktopInstallPromptStartTimeMS &&
+        Date.now() - _desktopInstallPromptStartTimeMS >
+          DESKTOP_INSTALL_MAX_WAIT_TIME_MS
+      )
+    ) {
       // debugMessage("SHOW DESKTOP CHROME PROMOTION: PROMPT NOT FIRED");
       if (_desktopInstallPromptStartTimeMS === null) {
         _desktopInstallPromptStartTimeMS = Date.now();
