@@ -17,7 +17,7 @@
     <!-- ====================  END: These headers required for any webapp  ==================== -->
 
     <!-- ====================  BEGIN: Include add-to-homescreen resources  ==================== -->
-
+    <script src="./add-to-homescreen.min.js"></script>
     <link rel="stylesheet" href="./add-to-homescreen.min.css" />
   <script defer src="add-to-homescreen_it.min.js"></script><link href="add-to-homescreen.min.css" rel="stylesheet"></head>
   <!-- ====================  END: Include add-to-homescreen resources  ==================== -->
@@ -748,7 +748,7 @@
           appIconUrl: "./assets/sample/img/aardvark-logo.png", // App icon link (square, at least 40 x 40 pixels) [Required]
           assetUrl: "./assets/img/", // Link to directory of library image assets [Required]
           maxModalDisplayCount: -1, // If set, the modal will only show this many times [Optional. Default: -1 (no limit).]
-          displayOptions:{ showMobile: true, showDesktop: true }, // show on mobile/desktop [Optional] Default: show everywhere
+          displayOptions: { showMobile: true, showDesktop: true }, // show on mobile/desktop [Optional] Default: show everywhere
           allowClose: true, // allow the user to close the modal by tapping outside of it. [Optional. Default: true]
           // (Debugging: Use this.clearModalDisplayCount() to reset the count)
         });
