@@ -81,7 +81,10 @@ export function AddToHomeScreen(
     ); // Android and Desktop Chrome/Safari/Edge
   }
 
-  function show(locale: string): DeviceInfo {
+  function show(
+    locale: string,
+    overrideDisplayOptions: boolean = false
+  ): DeviceInfo {
     if (locale && !localeCatalog[locale]) {
       console.log(
         "add-to-homescreen: WARNING: locale selected not available:",
@@ -132,14 +135,14 @@ export function AddToHomeScreen(
         (_canBeStandAlone = true),
         (_device = _device)
       );
-    } else if (_hasReachedMaxModalDisplayCount()) {
+    } else if (_hasReachedMaxModalDisplayCount() && !overrideDisplayOptions) {
       ret = new DeviceInfo(
         (_isStandAlone = false),
         (_canBeStandAlone = false),
         (_device = _device)
       );
     } else if (
-      displayOptions.showMobile &&
+      (displayOptions.showMobile || overrideDisplayOptions) &&
       (isDeviceIOS() || isDeviceAndroid())
     ) {
       debugMessage("NOT STANDALONE - IOS OR ANDROID");
@@ -244,7 +247,7 @@ export function AddToHomeScreen(
         (_device = _device)
       );
 
-      if (displayOptions.showDesktop) {
+      if (displayOptions.showDesktop || overrideDisplayOptions) {
         if (isDesktopChrome() || isDesktopEdge()) {
           debugMessage("DESKTOP CHROME");
           _incrModalDisplayCount();
