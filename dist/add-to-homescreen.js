@@ -64,7 +64,7 @@ function AddToHomeScreen(options) {
         return (!!("standalone" in window.navigator && window.navigator.standalone) || // IOS (TODO: detect iPad 13)
             !!window.matchMedia("(display-mode: standalone)").matches); // Android and Desktop Chrome/Safari/Edge
     }
-    function show(locale, overrideDisplayOptions = false) {
+    function show(locale, showDomainOnly = false, overrideDisplayOptions = false) {
         if (locale && !localeCatalog[locale]) {
             console.log("add-to-homescreen: WARNING: locale selected not available:", locale);
             locale = "";
@@ -145,19 +145,19 @@ function AddToHomeScreen(options) {
                 if (isBrowserAndroidChrome()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
                     if (!displayOptions.installChromeAndroid) {
-                        _genAndroidChrome(container);
+                        _genAndroidChrome(container, showDomainOnly);
                     }
                     else {
-                        showDesktopInstallPrompt();
+                        showDesktopInstallPrompt(showDomainOnly);
                     }
                 }
                 else if (isBrowserAndroidFirefox()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
-                    _genAndroidFirefox(container);
+                    _genAndroidFirefox(container, showDomainOnly);
                 }
                 else if (isBrowserAndroidFacebook()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = false), (_device = _device));
-                    _genIOSInAppBrowserOpenInSystemBrowser(container);
+                    _genIOSInAppBrowserOpenInSystemBrowser(container, showDomainOnly);
                 }
                 else {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = false), (_device = _device));
@@ -175,12 +175,12 @@ function AddToHomeScreen(options) {
                 if (isDesktopChrome() || isDesktopEdge()) {
                     debugMessage("DESKTOP CHROME");
                     _incrModalDisplayCount();
-                    showDesktopInstallPrompt();
+                    showDesktopInstallPrompt(showDomainOnly);
                 }
                 else if (isDesktopSafari()) {
                     debugMessage("DESKTOP SAFARI");
                     _incrModalDisplayCount();
-                    _showDesktopSafariPrompt();
+                    _showDesktopSafariPrompt(showDomainOnly);
                 }
             }
         }
@@ -342,9 +342,23 @@ function AddToHomeScreen(options) {
         return userAgent.includes("Edg/");
     }
     /**** Internal Functions ****/
-    function _getAppDisplayUrl() {
+    function _getAppDisplayUrl(showDomainOnly = false) {
         // return 'https://aardvark.app';
-        const currentUrl = new URL(window.location.href);
+        let currentUrl = new URL(window.location.href);
+        if (showDomainOnly) {
+            if (window.location.protocol !== "80" &&
+                window.location.protocol !== "443") {
+                currentUrl = new URL(window.location.protocol +
+                    "//" +
+                    window.location.hostname +
+                    ":" +
+                    window.location.port +
+                    "/");
+            }
+            else {
+                currentUrl = new URL(window.location.protocol + "//" + window.location.hostname + "/");
+            }
+        }
         return currentUrl.href.replace(/\/$/, "");
     }
     function _assertArg(variableName, booleanExp) {
@@ -451,11 +465,11 @@ function AddToHomeScreen(options) {
     function _genAssetUrl(fileName) {
         return assetUrl + fileName;
     }
-    function _genIOSSafari(container) {
+    function _genIOSSafari(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap the %s button in the toolbar.", _genListButtonWithImage(_genAssetUrl("ios-safari-sharing-api-button-2.svg")))) +
             _genListItem(`2`, simpleI18n_1.default.__("Select %s from the menu that pops up.", _genListButtonWithImage(_genAssetUrl("ios-safari-add-to-home-screen-button-2.svg"), simpleI18n_1.default.__("Add to Home Screen"), "right")) +
@@ -474,11 +488,11 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-ios", "adhs-safari");
     }
-    function _genIOSChrome(container) {
+    function _genIOSChrome(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap the %s button in the upper right corner.", _genListButtonWithImage(_genAssetUrl("ios-chrome-more-button-2.svg")))) +
             _genListItem(`2`, simpleI18n_1.default.__("Select %s from the menu that pops up.", _genListButtonWithImage(_genAssetUrl("ios-safari-add-to-home-screen-button-2.svg"), simpleI18n_1.default.__("Add to Home Screen"), "right")) +
@@ -496,11 +510,11 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-ios", "adhs-chrome");
     }
-    function _genIOSInAppBrowserOpenInSystemBrowser(container) {
+    function _genIOSInAppBrowserOpenInSystemBrowser(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap the %s button above.", `<img class="adhs-more-button" src="${_genAssetUrl("generic-more-button.svg")}"/>`)) +
             _genListItem(`2`, `${simpleI18n_1.default.__("Tap")} <span class="adhs-emphasis">${simpleI18n_1.default.__("Open in browser")}</span>`) +
@@ -514,11 +528,11 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-ios", "adhs-inappbrowser-openinsystembrowser");
     }
-    function _genIOSInAppBrowserOpenInSafariBrowser(container) {
+    function _genIOSInAppBrowserOpenInSafariBrowser(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap the %s button below to open your system browser.", `<img class="adhs-more-button" src="${_genAssetUrl("openinsafari-button.png")}"/>`)) +
             _genListEnd() +
@@ -531,11 +545,11 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-ios", "adhs-inappbrowser-openinsafari");
     }
-    function _genAndroidChrome(container) {
+    function _genAndroidChrome(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap %s in the browser bar.", _genListButtonWithImage(_genAssetUrl("android-chrome-more-button-2.svg")))) +
             _genListItem(`2`, simpleI18n_1.default.__("Tap %s", _genListButtonWithImage(_genAssetUrl("android-chrome-add-to-home-screen-button-2.svg"), simpleI18n_1.default.__("Add to Home Screen"), "left"))) +
@@ -551,11 +565,11 @@ function AddToHomeScreen(options) {
         container.innerHTML = containerInnerHTML;
         container.classList.add("adhs-mobile", "adhs-android", "adhs-chrome");
     }
-    function _genAndroidFirefox(container) {
+    function _genAndroidFirefox(container, showDomainOnly = false) {
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            // _genAppUrlHeader() +
+            // _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap %s in the browser bar.", _genListButtonWithImage(_genAssetUrl("android-chrome-more-button-2.svg")))) +
             _genListItem(`2`, simpleI18n_1.default.__("Tap %s", _genListButtonWithImage(_genAssetUrl("android-firefox-add-to-home-screen-button-2.svg"), simpleI18n_1.default.__("Add to Home Screen Firefox") !==
@@ -586,8 +600,8 @@ function AddToHomeScreen(options) {
         }
         return div("app-name") + appName + `</div>`;
     }
-    function _genAppUrlHeader() {
-        return div("app-url") + _getAppDisplayUrl() + `</div>`;
+    function _genAppUrlHeader(showDomainOnly = false) {
+        return div("app-url") + _getAppDisplayUrl(showDomainOnly) + `</div>`;
     }
     function _genBlurbWithMessage(message) {
         return div("blurb") + message + `</div>`;
@@ -601,14 +615,14 @@ function AddToHomeScreen(options) {
     function _genBlurbDesktopMac() {
         return _genBlurbWithMessage(simpleI18n_1.default.__("An icon will be added to your Dock so you can quickly access this website."));
     }
-    function _genDesktopChrome(container) {
+    function _genDesktopChrome(container, showDomainOnly = false) {
         var blurb = isDesktopMac()
             ? _genBlurbDesktopMac()
             : _genBlurbDesktopWindows();
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            _genAppUrlHeader() +
+            _genAppUrlHeader(showDomainOnly) +
             blurb +
             div("button-container") +
             `<button class="adhs-button adhs-button-cancel">
@@ -647,14 +661,14 @@ function AddToHomeScreen(options) {
             });
         });
     }
-    function _genDesktopSafari(container) {
+    function _genDesktopSafari(container, showDomainOnly = false) {
         var blurb = isDesktopMac()
             ? _genBlurbDesktopMac()
             : _genBlurbDesktopWindows();
         var containerInnerHTML = _genModalStart() +
             _genInstallAppHeader() +
             _genAppNameHeader() +
-            _genAppUrlHeader() +
+            _genAppUrlHeader(showDomainOnly) +
             _genListStart() +
             _genListItem(`1`, simpleI18n_1.default.__("Tap %s in the toolbar.", _genListButtonWithImage(_genAssetUrl("desktop-safari-menu.svg")))) +
             _genListItem(`2`, simpleI18n_1.default.__("Tap %s", _genListButtonWithImage(_genAssetUrl("desktop-safari-dock.svg"), simpleI18n_1.default.__("Add To Dock"), "left"))) +
@@ -752,7 +766,7 @@ function AddToHomeScreen(options) {
             (isDesktopChrome() || isDesktopEdge()));
     }
     // show the desktop chrome promotion
-    function showDesktopInstallPrompt() {
+    function showDesktopInstallPrompt(showDomainOnly = false) {
         debugMessage("SHOW DESKTOP CHROME / EDGE PROMOTION");
         if (_desktopInstallPromptWasShown) {
             return;
@@ -769,7 +783,7 @@ function AddToHomeScreen(options) {
                 _desktopInstallPromptStartTimeMS = Date.now();
             }
             setTimeout(() => {
-                showDesktopInstallPrompt();
+                showDesktopInstallPrompt(showDomainOnly);
             }, DESKTOP_INSTALL_POLL_MS);
             return;
         }
@@ -777,14 +791,14 @@ function AddToHomeScreen(options) {
         _desktopInstallPromptWasShown = true;
         var container = _createContainer(true // include_modal
         );
-        _genDesktopChrome(container);
+        _genDesktopChrome(container, showDomainOnly);
         _addContainerToBody(container);
     }
-    function _showDesktopSafariPrompt() {
+    function _showDesktopSafariPrompt(showDomainOnly = false) {
         debugMessage("SHOW SAFARI DESKTOP PROMPT");
         var container = _createContainer(true // include_modal
         );
-        _genDesktopSafari(container);
+        _genDesktopSafari(container, showDomainOnly);
         _addContainerToBody(container);
     }
     function div(className) {
