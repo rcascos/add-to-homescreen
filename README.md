@@ -5,7 +5,6 @@
 Fork of [philfung/add-to-homescreen](https://github.com/philfung/add-to-homescreen) repo, version 2.93. The main differences with the original are:
 
 - Works on Firefox for Android (with an icon created specifically for that browser).
-- New "DisplayOption" named "installChromeAndroid". If true, it offers to install the app not only in Chrome for Desktop but also Chrome for Android.
 - Added new parameter "overrideDisplayOptions" to "show()" function. If true, it offers to install the app even when DisplayOption is false.
 - Added new parameter "showDomainOnly" to "show()" function. If true, it shows the domain without the path.
 
@@ -136,8 +135,7 @@ This should be a quick drop-in library into your website.
      displayOptions:{
         showMobile: true,
         showDesktop: true,
-        installChromeAndroid: true
-     }, // show on mobile/desktop, show install on Chrome for Android (like Chrome for Desktop) [Optional] Default: show everywhere, not install directly on Chrome for Android
+     }, // show on mobile/desktop [Optional] Default: show everywhere
      allowClose: true, // allow the user to close the modal by tapping outside of it [Optional. Default: true]
 
 

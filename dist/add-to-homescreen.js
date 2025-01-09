@@ -144,12 +144,7 @@ function AddToHomeScreen(options) {
                 // android
                 if (isBrowserAndroidChrome()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
-                    if (!displayOptions.installChromeAndroid) {
-                        _genAndroidChrome(container, showDomainOnly);
-                    }
-                    else {
-                        showDesktopInstallPrompt(showDomainOnly);
-                    }
+                    _genAndroidChrome(container, showDomainOnly);
                 }
                 else if (isBrowserAndroidFirefox()) {
                     ret = new types_1.DeviceInfo((_isStandAlone = false), (_canBeStandAlone = true), (_device = _device));
@@ -927,7 +922,6 @@ exports.DeviceInfo = DeviceInfo;
 exports.DISPLAY_OPTIONS_DEFAULT = {
     showMobile: true,
     showDesktop: true,
-    installChromeAndroid: false,
 };
 function isDisplayOptions(obj) {
     return (obj &&

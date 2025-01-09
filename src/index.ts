@@ -207,11 +207,7 @@ export function AddToHomeScreen(
             (_canBeStandAlone = true),
             (_device = _device)
           );
-          if (!displayOptions.installChromeAndroid) {
-            _genAndroidChrome(container, showDomainOnly);
-          } else {
-            showDesktopInstallPrompt(showDomainOnly);
-          }
+          _genAndroidChrome(container, showDomainOnly);
         } else if (isBrowserAndroidFirefox()) {
           ret = new DeviceInfo(
             (_isStandAlone = false),
